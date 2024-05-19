@@ -1,22 +1,33 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Message } from './message.schema';
+import { Types } from 'mongoose';
+import { Participant } from './participant.schema';
 
-@Schema()
+@Schema({
+  id: true,
+  timestamps: true,
+  versionKey: false,
+})
 export class Conversation {
-  @Prop()
   _id: string;
 
-  @Prop()
-  name: string;
+  @Prop({
+    type: Message,
+    default: null,
+  })
+  lastMessage?: Message;
 
-  @Prop()
-  participants: string[];
+  @Prop({
+    type: Types.Array<Participant>,
+    required: true,
+  })
+  participants: Participant[];
 
-  @Prop()
-  createdAt: Date;
-
-  @Prop()
-  updatedAt: Date;
-
-  @Prop()
-  deletedAt: Date;
+  @Prop({
+    type: Date,
+    default: null,
+  })
+  deletedAt?: Date;
 }
+
+export const ConversationSchema = SchemaFactory.createForClass(Conversation);
