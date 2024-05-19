@@ -18,7 +18,7 @@ export class Conversation {
   lastMessage?: Message;
 
   @Prop({
-    type: Types.Array<Participant>,
+    type: [Participant],
     required: true,
   })
   participants: Participant[];

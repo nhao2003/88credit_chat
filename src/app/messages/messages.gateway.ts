@@ -13,26 +13,26 @@ export class MessagesGateway {
 
   @SubscribeMessage('createMessage')
   create(@MessageBody() createMessageDto: CreateMessageDto) {
-    return this.messagesService.create('id', createMessageDto);
+    // return this.messagesService.create('id', createMessageDto);
   }
 
   @SubscribeMessage('findAllMessages')
   findAll() {
-    return this.messagesService.findAll('60f3b3b3b3b3b3b3b3b3b3b');
+    // return this.messagesService.findAll('60f3b3b3b3b3b3b3b3b3b3b');
   }
 
   @SubscribeMessage('findOneMessage')
   findOne(@MessageBody() id: string) {
-    return this.messagesService.findOne(id);
+    // return this.messagesService.findOne(id);
   }
 
   @SubscribeMessage('updateMessage')
   update(@MessageBody() updateMessageDto: UpdateMessageDto) {
-    return this.messagesService.update(updateMessageDto.id, updateMessageDto);
+    // return this.messagesService.update(updateMessageDto.id, updateMessageDto);
   }
 
   @SubscribeMessage('removeMessage')
   remove(@MessageBody() id: string) {
-    return this.messagesService.remove(id);
+    // return this.messagesService.remove(id);
   }
 }

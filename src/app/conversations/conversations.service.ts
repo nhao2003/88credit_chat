@@ -6,7 +6,6 @@ import { Model } from 'mongoose';
 import { Conversation } from 'src/core/schema/conversation.schema';
 import { Message } from 'src/core/schema/message.schema';
 import { Participant } from 'src/core/schema/participant.schema';
-import { threadId } from 'worker_threads';
 
 @Injectable()
 export class ConversationsService {
@@ -26,13 +25,22 @@ export class ConversationsService {
     const participants = [userId, createConversationDto.otherUserId];
     let conversation = await this.conversationModel.findOne({
       participants: {
-        $all: participants,
+        $all: participants.map((participantId) => ({
+          $elemMatch: {
+            _id: participantId,
+          },
+        })),
       },
     });
 
     if (!conversation) {
       const newConversation = new this.conversationModel({
-        participants,
+        participants: participants.map(
+          (participantId) =>
+            ({
+              _id: participantId,
+            }) as Participant,
+        ),
       });
       conversation = await newConversation.save();
     }
