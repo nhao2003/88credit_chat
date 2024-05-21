@@ -2,14 +2,28 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayInit,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { ConversationsService } from './conversations.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 
 @WebSocketGateway()
-export class ConversationsGateway {
+export class ConversationsGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private readonly conversationsService: ConversationsService) {}
+
+  handleConnection(client: any, ...args: any[]) {
+    console.log('Client connected');
+    console.log(client.handshake);
+  }
+
+  handleDisconnect(client: any) {
+    console.log('Client disconnected');
+  }
 
   @SubscribeMessage('createConversation')
   create(@MessageBody() createConversationDto: CreateConversationDto) {
