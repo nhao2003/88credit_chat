@@ -3,53 +3,52 @@ import {
   SubscribeMessage,
   MessageBody,
   OnGatewayConnection,
-  OnGatewayInit,
   OnGatewayDisconnect,
+  ConnectedSocket,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { ConversationsService } from './conversations.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
-
-@WebSocketGateway()
+import { Logger, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { WsGuard } from 'src/core/guards';
+import { Socket } from 'socket.io';
+import { Server } from 'http';
+import { GetSocketUserId } from 'src/core/decorators';
+import { Conversation } from 'src/core/schema/conversation.schema';
+import { WsReponse, WsReponseType } from 'src/common/types';
+import { Namespace } from 'socket.io';
+@WebSocketGateway({
+  namespace: 'conversations',
+})
+@UseGuards(WsGuard)
+@UsePipes(
+  new ValidationPipe({
+    transform: true,
+  }),
+)
+// @UseFilters(ValidationSocketErrorFilter)
 export class ConversationsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
+  @WebSocketServer()
+  server: Namespace;
+  private readonly logger = new Logger(ConversationsGateway.name);
   constructor(private readonly conversationsService: ConversationsService) {}
 
   handleConnection(client: any, ...args: any[]) {
-    console.log('Client connected');
-    console.log(client.handshake);
+    this.logger.log('Client connected');
   }
 
   handleDisconnect(client: any) {
-    console.log('Client disconnected');
+    this.logger.log('Client disconnected');
   }
 
-  @SubscribeMessage('createConversation')
-  create(@MessageBody() createConversationDto: CreateConversationDto) {
-    // return this.conversationsService.create(createConversationDto);
-  }
-
-  @SubscribeMessage('findAllConversations')
-  findAll() {
-    // return this.conversationsService.findAll();
-  }
-
-  @SubscribeMessage('findOneConversation')
-  findOne(@MessageBody() id: string) {
-    // return this.conversationsService.findOne(id);
-  }
-
-  @SubscribeMessage('updateConversation')
-  update(@MessageBody() updateConversationDto: UpdateConversationDto) {
-    // return this.conversationsService.update(
-    //   updateConversationDto.id,
-    //   updateConversationDto,
-    // );
-  }
-
-  @SubscribeMessage('removeConversation')
-  remove(@MessageBody() id: string) {
-    // return this.conversationsService.remove(id);
+  notifyConversation(type: WsReponseType, conversation: Conversation) {
+    const response: WsReponse<Conversation> = {
+      type,
+      data: conversation,
+    };
+    this.server.to(conversation._id).emit('conversation', response);
   }
 }

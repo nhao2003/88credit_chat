@@ -5,12 +5,18 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { Body, Get, Post, Patch, Delete, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUserId } from 'src/core/decorators';
+import { ConversationsGateway } from '../conversations/conversations.gateway';
+import { MessagesGateway } from './messages.gateway';
 
 @Controller('conversations/:conversationId/messages')
 @ApiTags('messages')
 @ApiBearerAuth()
 export class MessagesController {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly conversationsGateway: ConversationsGateway,
+    private readonly messagesGateway: MessagesGateway,
+  ) {}
 
   @Get()
   findAll(
@@ -26,16 +32,18 @@ export class MessagesController {
   }
 
   @Post()
-  create(
+  async create(
     @GetCurrentUserId() userId: string,
     @Param('conversationId') conversationId: string,
     @Body() createMessageDto: CreateMessageDto,
   ) {
-    return this.messagesService.create(
+    const message = await this.messagesService.create(
       userId,
       conversationId,
       createMessageDto,
     );
+    this.messagesGateway.notifyMessage(conversationId, message);
+    return message;
   }
 
   @Patch(':id')

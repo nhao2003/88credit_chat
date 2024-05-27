@@ -23,5 +23,6 @@ import {
   ],
   providers: [ConversationsGateway, ConversationsService],
   controllers: [ConversationsController],
+  exports: [ConversationsGateway],
 })
 export class ConversationsModule {}

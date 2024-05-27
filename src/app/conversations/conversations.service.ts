@@ -32,7 +32,7 @@ export class ConversationsService {
         })),
       },
     });
-
+    let isNew = false;
     if (!conversation) {
       const newConversation = new this.conversationModel({
         participants: participants.map(
@@ -43,9 +43,9 @@ export class ConversationsService {
         ),
       });
       conversation = await newConversation.save();
+      isNew = true;
     }
-
-    return conversation;
+    return { conversation, isNew };
   }
 
   findAll(userId: string) {

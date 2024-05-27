@@ -1,5 +1,5 @@
-# Use the official Node.js 20 image
-FROM node:20-alpine
+# Use the official Node.js latest
+FROM node:latest
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
@@ -20,4 +20,4 @@ RUN yarn build
 EXPOSE 3000
 
 # Start the app
-CMD [ "yarn", "run", "start:prod" ]
+CMD [ "yarn", "run", "preview" ]
