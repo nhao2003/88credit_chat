@@ -40,6 +40,6 @@ export class MessagesGateway
       type: WsReponseType.NEW,
       data: message,
     };
-    this.server.to(conversationId).emit('message', response);
+    this.server.emit('message', response);
   }
 }

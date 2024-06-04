@@ -17,7 +17,10 @@ COPY . .
 RUN yarn build
 
 # Expose the port that the app will listen on
-EXPOSE 3000
+EXPOSE 1000
+
+# Set the environment variables
+ENV RABBITMQ_HOST=rabbitmq
 
 # Start the app
 CMD [ "yarn", "run", "preview" ]

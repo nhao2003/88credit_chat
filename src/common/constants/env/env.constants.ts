@@ -7,6 +7,7 @@ abstract class EnvConstants {
   public static readonly port = 'PORT';
   public static readonly mongoUri = 'MONGO_URI';
   public static readonly accessTokenSecret = 'ACCESS_TOKEN_SECRET';
+  public static RABBITMQ_HOST: string = 'RABBITMQ_HOST';
 }
 
 export { EnvConstants };
