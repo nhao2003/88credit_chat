@@ -86,6 +86,8 @@ export class MessagesService {
       throw new NotFoundException('Message not found');
     }
 
-    return message.deleteOne();
+    await this.messageModel.deleteOne({ _id: id });
+
+    return message;
   }
 }

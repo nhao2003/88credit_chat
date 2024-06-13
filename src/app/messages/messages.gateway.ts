@@ -15,6 +15,7 @@ import { Namespace } from 'socket.io';
 import { Server } from 'http';
 import { WsReponse, WsReponseType } from 'src/common/types';
 import { Message } from 'src/core/schema/message.schema';
+import { ConversationsService } from '../conversations/conversations.service';
 @WebSocketGateway({
   namespace: '/messages',
 })
@@ -25,21 +26,28 @@ export class MessagesGateway
   private readonly logger = new Logger(MessagesGateway.name);
   @WebSocketServer()
   server: Namespace;
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly conversationsService: ConversationsService,
+  ) {}
 
   handleConnection(client: any, ...args: any[]) {
-    this.logger.log('Client connected');
+    const { cid } = client.handshake.query;
+    if (!cid) {
+      return client.disconnect();
+    }
+    client.join(cid);
   }
 
   handleDisconnect(client: any) {
     this.logger.log('Client disconnected');
   }
 
-  notifyMessage(conversationId: string, message: any) {
+  notifyMessage(type: WsReponseType, message: Message) {
     const response: WsReponse<Message> = {
-      type: WsReponseType.NEW,
+      type,
       data: message,
     };
-    this.server.emit('message', response);
+    this.server.to(message.conversation.toString()).emit('message', response);
   }
 }

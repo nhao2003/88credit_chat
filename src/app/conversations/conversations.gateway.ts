@@ -39,10 +39,11 @@ export class ConversationsGateway
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log('Client connected');
     console.log(client.handshake.headers);
-    const { authorization } = client.handshake.headers;
-    if (!authorization) {
+    const { uid } = client.handshake.headers;
+    if (!uid) {
       return client.disconnect();
     }
+    client.join(uid);
   }
 
   handleDisconnect(client: any) {
@@ -54,6 +55,10 @@ export class ConversationsGateway
       type,
       data: conversation,
     };
-    this.server.to(conversation._id.toString()).emit('conversation', response);
+    // this.server.to(conversation._id.toString()).emit('conversation', response);
+
+    for (const participant of conversation.participants) {
+      this.server.to(participant.toString()).emit('conversation', response);
+    }
   }
 }

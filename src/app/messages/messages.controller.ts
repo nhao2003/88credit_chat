@@ -7,6 +7,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUserId } from 'src/core/decorators';
 import { ConversationsGateway } from '../conversations/conversations.gateway';
 import { MessagesGateway } from './messages.gateway';
+import { WsReponseType } from 'src/common/types';
 
 @Controller('conversations/:conversationId/messages')
 @ApiTags('messages')
@@ -42,21 +43,28 @@ export class MessagesController {
       conversationId,
       createMessageDto,
     );
-    this.messagesGateway.notifyMessage(conversationId, message);
+    this.messagesGateway.notifyMessage(WsReponseType.NEW, message);
     return message;
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messagesService.update(id, updateMessageDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateMessageDto: UpdateMessageDto,
+  ) {
+    // return this.messagesService.update(id, updateMessageDto);
+    const res = await this.messagesService.update(id, updateMessageDto);
+    this.messagesGateway.notifyMessage(WsReponseType.UPDATE, res);
   }
 
   @Delete(':id')
-  remove(
+  async remove(
     @GetCurrentUserId() userId: string,
     @Param('conversationId') conversationId: string,
     @Param('id') id: string,
   ) {
-    return this.messagesService.remove(userId, conversationId, id);
+    const res = await this.messagesService.remove(userId, conversationId, id);
+    this.messagesGateway.notifyMessage(WsReponseType.DELETE, res);
+    return res;
   }
 }

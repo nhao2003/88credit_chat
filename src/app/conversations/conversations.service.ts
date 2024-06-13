@@ -71,6 +71,10 @@ export class ConversationsService {
     return conversation;
   }
 
+  findConversationById(id: string) {
+    return this.conversationModel.findById(id);
+  }
+
   update(
     userId: string,
     id: string,
