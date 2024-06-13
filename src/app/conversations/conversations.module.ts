@@ -18,6 +18,6 @@ import { ConversationsController } from './conversations.controller';
   ],
   providers: [ConversationsGateway, ConversationsService],
   controllers: [ConversationsController],
-  exports: [ConversationsGateway],
+  exports: [ConversationsGateway, ConversationsService],
 })
 export class ConversationsModule {}
