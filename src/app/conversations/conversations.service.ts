@@ -5,7 +5,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Conversation } from 'src/core/schema/conversation.schema';
 import { Message } from 'src/core/schema/message.schema';
-import { Participant } from 'src/core/schema/participant.schema';
 
 @Injectable()
 export class ConversationsService {
@@ -25,22 +24,13 @@ export class ConversationsService {
     const participants = [userId, createConversationDto.otherUserId];
     let conversation = await this.conversationModel.findOne({
       participants: {
-        $all: participants.map((participantId) => ({
-          $elemMatch: {
-            _id: participantId,
-          },
-        })),
+        $all: participants,
       },
     });
     let isNew = false;
     if (!conversation) {
       const newConversation = new this.conversationModel({
-        participants: participants.map(
-          (participantId) =>
-            ({
-              _id: participantId,
-            }) as Participant,
-        ),
+        participants: participants,
       });
       conversation = await newConversation.save();
       isNew = true;
@@ -48,13 +38,13 @@ export class ConversationsService {
     return { conversation, isNew };
   }
 
-  findAll(userId: string) {
+  async findAll(userId: string) {
     // Get conversations with messages
-    const conversations = this.conversationModel
+    const conversations = await this.conversationModel
       .find({
         participants: {
           $elemMatch: {
-            _id: userId,
+            $eq: userId,
           },
         },
       })
@@ -70,7 +60,7 @@ export class ConversationsService {
       _id: id,
       participants: {
         $elemMatch: {
-          _id: userId,
+          $eq: userId,
         },
       },
     });
@@ -91,7 +81,7 @@ export class ConversationsService {
         _id: id,
         participants: {
           $elemMatch: {
-            _id: userId,
+            $eq: userId,
           },
         },
       },
@@ -110,13 +100,14 @@ export class ConversationsService {
       _id: id,
       participants: {
         $elemMatch: {
-          _id: userId,
+          $eq: userId,
         },
       },
     });
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
+    await this.messageModel.deleteMany({ conversation: id });
     return conversation;
   }
 }

@@ -29,7 +29,7 @@ export class Message {
     type: Types.ObjectId,
     required: true,
   })
-  conversation: Conversation;
+  conversation: Types.ObjectId;
 
   @Prop({
     type: String,
@@ -39,7 +39,7 @@ export class Message {
       message: (props) => `${props.value} is not a valid UUID!`,
     },
   })
-  senderId: string;
+  senderId: Types.UUID;
 
   @Prop({
     type: Content,
@@ -52,13 +52,6 @@ export class Message {
     },
   })
   content: Content;
-
-  @Prop({
-    type: Date,
-    required: false,
-    default: null,
-  })
-  deletedAt?: Date;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

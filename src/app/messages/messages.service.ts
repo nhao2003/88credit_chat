@@ -20,7 +20,7 @@ export class MessagesService {
       _id: conversationId,
       participants: {
         $elemMatch: {
-          _id: userId,
+          $eq: userId,
         },
       },
     });
@@ -52,12 +52,6 @@ export class MessagesService {
 
     conversation.lastMessage = newMessage;
 
-    conversation.participants.forEach((participant) => {
-      if (participant._id.toString() === userId) {
-        participant.lastSeenAt = new Date();
-      }
-    });
-
     await Promise.all([newMessage.save(), conversation.save()]);
 
     return newMessage;
@@ -67,19 +61,6 @@ export class MessagesService {
     await this.getConversation(userId, conversationId);
     return this.messageModel.find({
       conversation: conversationId,
-      $or: [
-        {
-          deletedAt: {
-            $exists: false,
-          },
-        },
-        {
-          deletedAt: {
-            $exists: true,
-            $eq: null,
-          },
-        },
-      ],
     });
   }
 
@@ -105,8 +86,6 @@ export class MessagesService {
       throw new NotFoundException('Message not found');
     }
 
-    message.deletedAt = new Date();
-
-    await message.save();
+    return message.deleteOne();
   }
 }

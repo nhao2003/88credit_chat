@@ -40,6 +40,7 @@ export class ConversationsController {
     @GetCurrentUserId() userId: string,
     @Body() createConversationDto: CreateConversationDto,
   ) {
+    console.log(userId, createConversationDto);
     const result = await this.conversationsService.getOrCreateConversation(
       userId,
       createConversationDto,

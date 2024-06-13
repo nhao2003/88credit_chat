@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Message } from './message.schema';
 import { Types } from 'mongoose';
-import { Participant } from './participant.schema';
 
 @Schema({
   id: true,
@@ -9,7 +8,7 @@ import { Participant } from './participant.schema';
   versionKey: false,
 })
 export class Conversation {
-  _id: string;
+  _id: Types.ObjectId;
 
   @Prop({
     type: Message,
@@ -18,16 +17,10 @@ export class Conversation {
   lastMessage?: Message;
 
   @Prop({
-    type: [Participant],
+    type: [Types.UUID],
     required: true,
   })
-  participants: Participant[];
-
-  @Prop({
-    type: Date,
-    default: null,
-  })
-  deletedAt?: Date;
+  participants: Types.UUID[];
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);

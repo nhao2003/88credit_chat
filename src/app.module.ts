@@ -6,12 +6,15 @@ import { EnvConstants } from './common/constants/env/env.constants';
 import { ConversationsModule } from './app/conversations/conversations.module';
 import { MessagesModule } from './app/messages/messages.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RouterModule } from '@nestjs/core';
 import { AccessTokenJwtGuard, WsGuard } from './core/guards';
 import { AccessTokenStrategy, WsJwtStrategy } from './core/strategies';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { LoggerMiddleware } from './core/middlewares/logger.middleware';
+import {
+  TransformationInterceptor,
+  LoggingInterceptor,
+} from './core/interceptors';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,6 +53,14 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
     {
       provide: APP_GUARD,
       useClass: WsGuard,
+    },
+    {
+      provide: 'APP_INTERCEPTOR',
+      useClass: TransformationInterceptor,
+    },
+    {
+      provide: 'APP_INTERCEPTOR',
+      useClass: LoggingInterceptor,
     },
   ],
 })

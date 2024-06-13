@@ -36,8 +36,13 @@ export class ConversationsGateway
   private readonly logger = new Logger(ConversationsGateway.name);
   constructor(private readonly conversationsService: ConversationsService) {}
 
-  handleConnection(client: any, ...args: any[]) {
+  handleConnection(client: Socket, ...args: any[]) {
     this.logger.log('Client connected');
+    console.log(client.handshake.headers);
+    const { authorization } = client.handshake.headers;
+    if (!authorization) {
+      return client.disconnect();
+    }
   }
 
   handleDisconnect(client: any) {
@@ -49,6 +54,6 @@ export class ConversationsGateway
       type,
       data: conversation,
     };
-    this.server.to(conversation._id).emit('conversation', response);
+    this.server.to(conversation._id.toString()).emit('conversation', response);
   }
 }

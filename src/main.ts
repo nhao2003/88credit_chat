@@ -18,6 +18,8 @@ async function bootstrap() {
       queue: 'chat_queue',
     },
   });
+  app.startAllMicroservices();
+  SwaggerConfig.config(app);
   const port = configService.get<number>(EnvConstants.port);
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());

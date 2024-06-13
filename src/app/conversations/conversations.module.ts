@@ -8,17 +8,12 @@ import {
 } from 'src/core/schema/conversation.schema';
 import { Message, MessageSchema } from 'src/core/schema/message.schema';
 import { ConversationsController } from './conversations.controller';
-import {
-  Participant,
-  ParticipantSchema,
-} from 'src/core/schema/participant.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Conversation.name, schema: ConversationSchema },
       { name: Message.name, schema: MessageSchema },
-      { name: Participant.name, schema: ParticipantSchema },
     ]),
   ],
   providers: [ConversationsGateway, ConversationsService],
